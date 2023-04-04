@@ -1,0 +1,542 @@
+Goroutines là gì?
+
+Goroutines là một trong những tính năng đặc biệt nhất của Golang để lập trình Concurrency cực kỳ đơn giản. 
+Goroutines bản chất là các hàm (function) hay method được thực thi một các độc lập và đồng thời nhưng vẫn có thể kết nối với nhau.
+Một cách ngắn gọn, những thực thi đồng thời được gọi là Goroutines trong Go (Golang).
+
+// Leetcode
+// problem leetcode 540. Single Element in a Sorted Array
+// You are given a sorted array consisting of only integers where every element appears exactly twice, except for one element which appears exactly once.
+// Return the single element that appears only once.
+// Your solution must run in O(log n) time and O(1) space.
+func singleNonDuplicate(nums []int) int {
+	for i := 0; i < len(nums); i++ {
+		j := i + 1
+		valueLeft := nums[i]
+		if j == len(nums) {
+			return nums[j-1]
+		} else {
+			valueRight := nums[j]
+			if valueLeft != valueRight {
+				return nums[i]
+			}
+			i++
+		}
+	}
+	return nums[0]
+}
+
+
+
+1.
+- Cài Extension Go của Google cho VScode
+
+- Quy định về viết testcode:
+	+ file test: name_file_test.go 
+		VD: file: create_article.go  => file test: create_article_test.go
+	+ Function: Bắt đầu bằng Test.
+		VD: TestCreateArticle
+	
+	=> VSCode sau khi cài extendsion Go sẽ tự động nhận dạng và hiển thị run test/debug test cho dev dễ làm việc.
+	
+	=====>>>>> File test có thể tạo thành 1 folder riêng, thoải mái không phải gọi gì cả
+	
+- Sử dụng các hàm Equal, execEqual trong thư viện test thay cho việc check/so sánh các giá trị
+	VD: a := assert.New(t)
+	a.Equal(http.MethodGet, req.Method, "HTTP request method error")
+	a.Equal(http.StatusOK, w.Code, "HTTP request status code error")
+	
+	
+
+Cách viết unitest cho rest api trong golang
+Tham khảo link: https://blog.vietnamlab.vn/cach-viet-unit-test-cho-rest-api-trong-golang/
+
+Phương thức test trong Golang sẽ nhận vào tham số và có thể sẽ sử dụng 1 số phương thức như bên dưới:
+
+Tham số đầu tiên và duy nhất phải là t *testing.T
+t.Log có thể được dùng nếu ta có nhu cầu in ra thông tin, sau đó tiếp tục chạy tiếp
+t.Fail được dùng để đánh dấu là hàm test đã bị fail nhưng vẫn tiếp tục chạy tiếp.
+t.Error là cách viết gọn, nó tương đương với việc gọi t.Log, sau đó gọi thêm t.Fail. Nếu hàm này được dùng khi ta muốn chạy tiếp để debug thêm thông tin. t.Errorf cũng tương tự như t.Error nhưng được hỗ trợ thêm fomart khi log thông tin.
+t.Fatal được dùng khi log thông tin ra, đánh dấu là test đã bị fail và dừng luôn tại đó vì nếu có chạy tiếp thì không có gì đáng quan tâm cả.
+
+
+
+Chạy file test (chạy check tất cả các function test): run toàn bộ test case
+	go test -v 
+Nếu muốn chạy 1 testcase cụ thể dùng lệnh:
+	go test -v -run <Test function name>	
+
+- Coverage for golang 
+cd vào thư mục test, chạy lệnh:
+		- go test -cover fmt
+		
+Cách output HTML for Go code Coverage
+	Chạy lệnh: 
+		go test ./...
+	Chạy tiếp lệnh để tạo file coverage.out
+		go test ./... -coverprofile coverage.out
+	Coverage profile content
+		cat coverage.out
+	Coverage output as HTML 
+		go tool cover -html coverage.out -o coverage.html
+		
+
+2. Variable and function
+
+	* Cú pháp khai báo biến
+		var abc int 		// cách 1
+		abc = 10
+		
+		var abc int = 10	// cách 2
+		
+		abc := 10.5 		// cách 3 - linh động kiểu dữ liệu
+
+	* Phạm vi sử dụng global, block scope
+		Trong package, trong block 
+		Biến/Hàm khai báo  viết hoa thì được sử dụng trong cùng 1 package
+		
+		Đặt tên bến, hàm: dùng Camel Case
+						Chữ thường đầu: Private
+						Chữ hoa đầu: Public
+		
+		Cách chuyển kiểu int sang float32: float32(i)
+		
+	* Try/catch: Trong go không dùng try/catch để báo lỗi, mà dùng error. Mặc định error là nil 
+
+	* Ví dụ:
+	
+	func main() {
+		var whatToSay string
+		var i int
+
+		whatToSay = "Goodbye, world"
+		fmt.Println((whatToSay))
+		i = 10
+
+		fmt.Println("i is set to: ", i)
+
+		whatToSay = saySomething()
+		fmt.Println(whatToSay)
+
+		s := "12345"
+		// s := "123abc"
+
+		// convert string to int
+		i, err := strconv.Atoi(s)
+		if err != nil {
+			// ... handle error
+			fmt.Println("Error data string convert: ", err)
+		}
+		fmt.Println("string to int i: ", i)
+
+		// var number string
+		str := addString("Hello", "World")
+		fmt.Println("Add value: ", str)
+
+		// add number
+		// var number int
+		number := addNumber(10, 20)
+
+		fmt.Println("number: ", number)
+
+		// return 2 value
+		fmt.Println(saySomethingValue())
+
+	}
+
+	func saySomething() string {
+		return "Waoooooooooooooo"
+	}
+
+	// add function string
+	func addString(a, b string) string {
+		return a + b
+	}
+
+	// add function number
+	func addNumber(a, b int) int {
+		return a + b
+	}
+
+	// return 2 value
+	func saySomethingValue() (string, string) {
+		a := "Viet"
+		b := "Nam"
+		return a, b
+	}
+
+
+
+3. Pointer
+
+	Con trỏ: var a int = 10;
+			var b *int = &a			// b trỏ tới địa chỉ a
+			
+	Ví dụ: 
+		var a int = 12				
+		var b int = a				// gán b = a
+		fmt.Println(a, b)			// 12, 12
+		a = 20						// đặt lại giá trị của a.
+		fmt.Println(a, b)			// 20, 12		// b không thay đổi, dù a thay đổi.
+		
+	Vậy muốn b thay đổi theo a, thì phải gán giá trị của b theo địa chỉ của a (pointer)
+		var a int = 12				
+		var b *int = &a				// gán b = a
+		fmt.Println(a, b)			// 12, 0xc00000eb88
+		fmt.Println(a, *b)			// 12 12				// *b là giá trị
+		a = 20						// đặt lại giá trị của a.
+		fmt.Println(a, b)			// 20, 0xc00000eb88		// b không thay đổi, dù a thay đổi.
+		fmt.Println(a, *b)			// 20 20
+		fmt.Println(&a, b)			// 0xc00000eb88 0xc00000eb88			// &a: địa chỉ của a, chính là b
+
+	=> Muốn lấy giá trị của b thì dùng *b
+	=> Muốn lấy địa chỉ thì dùng & 
+		
+		
+		
+4. Array - slice - mảng
+	Aray: Khai báo: 
+		names := []string{"one", "two", "three"}
+		number := []int{1, 2, 3, 5}
+		
+		Mảng 3 phần tử, kiểu số nguyên có sẵn phần tử
+			pArr := [3]int{1, 2, 3}
+		Mảng 3 phần tử, kiểu int không có sẵn phần tử
+			var pArr [3]int			// golang sẽ tự cấp phát 3 giá trị mặc định [0, 0, 0]
+			VD:
+			var nameArray [5]string
+			nameArray[0] = "Cowell"
+			nameArray[1] = "Asia"
+			nameArray[2] = "VN"
+			fmt.Println("name: ", nameArray, len(nameArray))
+			fmt.Printf("%v, %T\n ", nameArray, nameArray)
+			
+					
+	Slice: (thực ra cũng là array)
+		var mySlice []int
+		VD:
+			mySlice = append(mySlice, 1)
+			mySlice = append(mySlice, 3)
+			mySlice = append(mySlice, 2)
+			mySlice = append(mySlice, 5)
+			log.Println(mySlice)		// 2023/02/21 17:31:04 [1 3 2 5]
+			sort.Ints(mySlice)
+			fmt.Println(mySlice)		// [1 2 3 5]
+
+			
+			var mySlice []string
+			mySlice = append(mySlice, "One")
+			mySlice = append(mySlice, "Two")
+			mySlice = append(mySlice, "Three")
+			mySlice = append(mySlice, "Four")
+			mySlice = append(mySlice, "Five")
+			mySlice = append(mySlice, "Six")
+			log.Println(mySlice)			// 2023/02/21 17:34:47 [One Two Three Four Five Six]
+			
+			
+	Map:
+		// Khởi tạo map, với key và value kiểu string
+			myMap := make(map[string]string)
+			// gán giá trị theo key, value
+			myMap["cat"] = "Tom"
+			myMap["dog"] = "John"
+
+			fmt.Println(myMap["cat"])
+			fmt.Println(myMap["dog"])
+			fmt.Println(myMap)// Khởi tạo map, với key và value kiểu string - int
+			myMap2 := make(map[string]int)
+			myMap2["First"] = 1
+			myMap2["Second"] = 2
+			myMap2["Third"] = 3
+			fmt.Println(myMap2, myMap2["First"], myMap2["Second"], myMap2["Third"])
+			
+			
+	Sử dụng Map và Struct:	
+	
+		type User struct {
+			FirstName string
+			LastName  string
+			Age       int
+		}
+
+		func main() {
+			// Khởi tạo map, với key - string và value kiểu user
+			myMap := make(map[string]User)
+			// gán giá trị theo key, value
+			me := User{
+				FirstName: "Bac",
+				LastName:  "Ng",
+				Age:       20,
+			}
+
+			myMap["me"] = me
+			log.Println(myMap["me"].FirstName)
+			log.Println(myMap["me"].LastName)
+			log.Println(myMap["me"].Age)
+		}
+
+5. Struct: Kiểu dữ liệu tự định nghĩa
+		Khai báo kiểu:
+			
+		type User struct {
+			FirstName   string
+			LastName    string
+			PhoneNumber string
+			Age         int
+			BirthDate   time.Time
+		}
+
+		Sử dụng kiểu:
+
+		func main() {
+			user := User{
+				FirstName: "Cowell",
+				LastName:  "Asia",
+			}
+
+			log.Println("user: ", user)
+			log.Println("user: ", user.FirstName, user.LastName, user.BirthDate)
+		}
+		
+	
+6	Sử dụng Struct với Function:	Cái này dùng nhiều trong Golang 
+	
+	// khai báo struct
+	type myStruct struct {
+		FirstName string			
+	}
+
+	// Khai báo hàm thuộc kiểu struct
+	func (m *myStruct) printFirstName() string {
+		return m.FirstName				// nên được gọi như này
+	}
+
+	func main() {
+
+		var myVar myStruct
+		myVar.FirstName = "Bac Ng"
+		myVar2 := myStruct{
+			FirstName: "Golang",
+		}
+
+		fmt.Println("myVar is set to: ", myVar.FirstName)
+		fmt.Println("myVar2 is set to: ", myVar2.FirstName)
+
+		fmt.Println("myVar using printFirstName: ", myVar.printFirstName())			// Sẽ gọi như này
+		fmt.Println("myVar2  using printFirstName: ", myVar2.printFirstName())
+	}
+	
+
+7. Interfaces
+
+
+	type Animal interface {
+		Says() string
+		NumberOfLegs() int
+	}
+
+	type Dog struct {
+		Name  string
+		Breed string
+	}
+
+	type Gorilla struct {
+		Name          string
+		Color         string
+		NumberOfTeeth int
+	}
+
+	func PrintInfor(a Animal) {
+		fmt.Println("This animal says", a.Says(), "and has", a.NumberOfLegs(), "legs")
+	}
+	func main() {
+
+		dog := Dog{
+			Name:  "Samson",
+			Breed: "German Shephered",
+		}
+
+		PrintInfor(&dog)
+
+		gorilla := Gorilla{
+			Name:          "Tanala",
+			Color:         "Black",
+			NumberOfTeeth: 38,
+		}
+
+		PrintInfor(&gorilla)
+
+	}
+
+	func (d *Dog) Says() string {
+		return "Graoooooooooooooooo"
+	}
+
+	func (d *Dog) NumberOfLegs() int {
+		return 4
+	}
+
+	func (g *Gorilla) Says() string {
+		return "Waoooooooooo Gurrrrrrrrrrrrrr"
+	}
+
+	func (g *Gorilla) NumberOfLegs() int {
+		return 2
+	}
+
+
+8. Packages
+	// create folder package 
+	// create file helpers.go
+	package helpers		
+	type Dog struct {
+		Name  string
+		Breed string
+		Age   int
+	}
+
+	// in file main.go
+	package main
+
+	import (
+		"log"
+		"go.mod/helpers"
+	)
+
+	func main() {
+
+		var dog helpers.Dog
+		dog.Name = "Samson"
+		dog.Breed = "German Shephered"
+		dog.Age = 19
+
+		log.Println(dog)
+
+	}
+
+
+II. Build app caas backend dtpt
+- run docker file:
+Cd vào folder 
+Chạy lệnh
+	docker-compose build 
+	docker-compose up
+	
+// cd mysql
+	mysql -udtpt -pdtpt
+	show databases; 	// list db
+	
+	
+III. Build Web Golang
+
+1. Build Web Hello world
+package main
+
+import (
+	"fmt"
+	"net/http"
+)
+
+func main() {
+	// fmt.Println("Hello World")
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		n, err := fmt.Fprintf(w, "Hello World Golang")
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(fmt.Sprintf("Number of bytes written: %d", n))
+	})
+	_ = http.ListenAndServe(":8088", nil)
+
+}
+
+
+go run main.go
+
+
+2. Chạy lệnh: 
+	go mod init myapp
+	
+	Lệnh này sẽ tạo 1 file go.mod trong đó chứa các thông tin về project (version go)
+	đồng thời, sau đó chỉ cần chạy lệnh 
+		go run .
+	chứ không cần phải chạy 
+		go run main.go như trước
+		
+		
+		
+3. VD: Create new project with page, route
+
+package main
+
+import (
+	"errors"
+	"fmt"
+	"net/http"
+)
+
+var portNumber string = ":8088"
+
+func Home(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Home World Golang")
+}
+func About(w http.ResponseWriter, r *http.Request) {
+	sum := addValues(10, 20)
+	_, _ = fmt.Fprintf(w, "This is about about page. AddValue 10 and 20 is: %d", sum)
+}
+
+func addValues(x, y int) int {
+	return x + y
+}
+
+func Devide(w http.ResponseWriter, r *http.Request) {
+	f, err := divideValues(100.0, 0.0)
+	if err != nil {
+		fmt.Fprintf(w, "Cannot divide by 0")
+		return
+	}
+	fmt.Fprintf(w, fmt.Sprintf("%f devided by %f is %f", 100.0, 0.0, f))
+}
+
+func divideValues(x, y float32) (float32, error) {
+	if y <= 0 {
+		err := errors.New("Cannot divide by zero")
+		return 0, err
+	}
+
+	result := x / y
+	return result, nil
+}
+
+func main() {
+	// fmt.Println("Hello World")
+	http.HandleFunc("/", Home)
+	http.HandleFunc("/about", About)
+	http.HandleFunc("/divide", Devide)
+	fmt.Println(fmt.Sprintf("Starting application on port %s", portNumber))
+	_ = http.ListenAndServe(portNumber, nil)
+
+}
+
+
+4. Tách thành các file riêng 
+https://github.com/bacnghg/app-base-go/commit/3c30eb8e7e7ac846246fe872de372dac801a24f2
+
+5. Add layout
+// Add layout: base.layout.tmpl
+https://github.com/bacnghg/app-base-go/commit/24b3a5d3ce9da638137f788ff9380f902d07a463
+
+6. Building Template cache test 
+https://github.com/bacnghg/app-base-go/pull/2/commits/9ee3e1cd0a1d7f3b6d0bb0d05c6a1ca7f2add3b6
+//building cache for layout dùng chung 
+
+
+Nơi đề nghị tạm trú:
+Ghi tới Vinhomes Park
+
+Không ghi nơi tạm trú, chỉ ghi nơi thường trú (mục 7 và 9)
+
+Nhập khẩu con ở quê.
+Ký, giấy trước 
+
+Nộp hồ sơ đăng ký thường trú
